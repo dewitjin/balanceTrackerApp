@@ -56,7 +56,7 @@ If you would like to contribute please fork the repo and I will review code.
 
 The MIT License (MIT)
 
-Copyright (c) 2015 DEWI TJIN
+Copyright (c) 2016 DEWI TJIN
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
