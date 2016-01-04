@@ -11,7 +11,7 @@ go to Main.java and assign the variables with your username and password.
   public static final String LOGIN_USERNAME = "";
   public static final String LOGIN_PASSWORD = "";
 
-![alt tag](https://raw.githubusercontent.com/dewitjin/Balance-Tracker/master/images/loginImage.png)
+![alt tag](https://raw.githubusercontent.com/dewitjin/balanceTrackerApp/master/images/loginImage.png)
 
 When you are ready, create another java jar file and use that jar to create accounts and update balances. However, the one provided in the out folder is good to go as is.
 
@@ -23,7 +23,7 @@ No specific examples right now.
 
 The project exists because I needed to replace an excel spreadsheet that I was using to track my finances.  I wanted something that was intuitive and I could keep private. I did not do a lot of research to see what was already built and free to download before starting this project.  I wanted to build something on my own.
 
-![alt tag](https://raw.githubusercontent.com/dewitjin/Balance-Tracker/master/images/addNewAccount.png)
+![alt tag](https://raw.githubusercontent.com/dewitjin/balanceTrackerApp/master/images/addNewAccount.png)
 
 Special thanks to Matthew Lawrence for his code reviews and help to get the project done. He was instrumental in helping me clean up some critical primary key codes.
 
