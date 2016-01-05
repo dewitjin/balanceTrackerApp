@@ -1,0 +1,219 @@
+2015Dec17-
+Code sample
+
+private void testingDbContents(){
+		Bank td = new Bank("TD", "TD Bank");
+//		Bank hsbc = new Bank("HSBC", "Hong Kong Shanghai Bank");
+//		Bank ing = new Bank("ING", "ING Bank");
+//		
+		Account s = new Account("savings", td, Types.SAVING.getAccountType());
+		Account c = new Account("chequing", td, Types.CHEQUING.getAccountType());
+//		Account rI = new Account("rrsp_inve", td, Types.RRSP_INVESTMENTS.getAccountType());
+//		Account oI = new Account("oth_inv", td, Types.OTHER_INVESTMENTS.getAccountType());
+//		
+		Balance a = new Balance(td, s, 2015, 03, 23, 23.34f, "extra notes");
+		Balance b = new Balance(td, c, 2015, 03, 24, 23.34f, "extra notes BBB");
+		
+		try {
+			banlanceDao.add(a);
+			banlanceDao.add(b);
+			accountDao.add(s);
+			bankDao.add(td);
+		} catch (Exception e) {
+			LOG.debug(e.getMessage());
+		}
+		
+		
+//		System.out.println("value of key for a: " + a.getKey());
+//		System.out.println("value of key for b: " + b.getKey());
+		
+//		Balance cb = new Balance(td, rI, 2015, 03, 23, 23.34f, "extra notes CCC");
+//		Balance d = new Balance(td, oI, 1000, 01, 23, 23.34f, "extra notes for DDD");
+//		Balance e = new Balance(td, s, 2015, 01, 23, 23.34f, "extra notes EEE");
+//		Balance f = new Balance(td, c, 1000, 01, 23, 23.34f, "extra notes FFF");
+//		
+//		Balance g = new Balance(hsbc, s, 2015, 01, 23, 23.34f, "extra notes");
+//		Balance h = new Balance(hsbc, c, 1000, 01, 23, 23.34f, "extra notes BBB");
+//		Balance i = new Balance(hsbc, rI, 2015, 01, 23, 23.34f, "extra notes CCC");
+//		Balance j = new Balance(hsbc, oI, 1000, 01, 23, 23.34f, "extra notes for DDD");
+//		Balance k = new Balance(hsbc, s, 2015, 01, 23, 23.34f, "extra notes EEE");
+//		Balance l = new Balance(hsbc, c, 1000, 01, 23, 23.34f, "extra notes FFF");
+//		
+//		Balance m = new Balance(ing, s, 2015, 01, 23, 23.34f, "extra notes");
+//		Balance n = new Balance(ing, c, 1000, 01, 23, 23.34f, "extra notes BBB");
+//		Balance o = new Balance(ing, rI, 2015, 01, 23, 23.34f, "extra notes CCC");
+//		Balance p = new Balance(ing, oI, 1000, 01, 23, 23.34f, "extra notes for DDD");
+//		Balance q = new Balance(ing, s, 2015, 01, 23, 23.34f, "extra notes EEE");
+//		Balance r = new Balance(ing, c, 1000, 01, 23, 23.34f, "extra notes FFF");
+		
+		try {
+			if (!Database.tableExists(BalanceDao.TABLE_NAME_BALANCES)) {
+				//MOVE THIS ON TOP IF YOU WANT TO USE IT
+				// already created table in init() banlanceDao.create();
+				// add balance to datbase
+//				banlanceDao.add(a);
+//				banlanceDao.add(b);
+//				bd.add(cb);
+//				bd.add(d);
+//				bd.add(e);
+//				bd.add(f);
+//				bd.add(g);
+//				bd.add(h);
+//				bd.add(i);
+//				bd.add(j);
+//				bd.add(k);
+//				bd.add(l);
+//				bd.add(m);
+//				bd.add(n);
+//				bd.add(o);
+//				bd.add(p);
+//				bd.add(r);
+				
+				//for(Balance b1 : bd.getAllBalance()){
+					//LOG.debug("BALANCE DATA after getAllBalance() : " + b1.toString());
+				//}				
+				//LOG.debug("readByReferenceKey() this should return the first balance object with id 1: " + bd.readByBalanceReferenceKey(1));
+				
+//				LOG.debug("getBalances_ByBankPrefix");
+//				LOG.debug(bd.getAllBalances_ByBankPrefix("TD"));
+				
+//				LOG.debug("getAllBalances_ByBankPrefixAndAccountName");
+//				LOG.debug(bd.getAllBalances_ByBankPrefixAndAccountName("TD", "savings"));
+				
+//				LOG.debug("getAllBalances_ByYEARandMONTH");
+//				LOG.debug(bd.getAllBalances_ByYEARandMONTH(2015, 03));
+				
+//				LOG.debug("getAllBalances_BySpecificDATE");
+//				LOG.debug(bd.getAllBalances_BySpecificDATE(2015, 03, 23));
+				
+				//this is NOT WORKING FIX LATER
+//				LOG.debug("getAllBalances_ByDateRange");
+//				LOG.debug(bd.getAllBalances_ByDateRange(2015,03,23, 2015, 03,24));
+			
+			}
+
+		} catch (SQLException ex) {
+			LOG.debug(ex.getMessage());
+		} catch (Exception ex) {
+			LOG.debug(ex.getMessage());
+		}
+
+	}
+	
+2015Dec17-
+Code sample
+
+/**
+	 * Add a bank to the row
+	 * NOTE: throws an error if there are more than one row with the same PK,
+	 * if bankCheck can't be read then row with that pk doesn't exist and then connect to db etc. 
+	 * (this has be in the same try/catch block as readreadByBankPrefix method because code
+	 * can only be executed if the read method doesn't throw an error)
+	 * @param bank
+	 * @throws SQLException
+	 */
+	public void add(Bank bank) throws SQLException {
+		Statement statement = null;
+		
+		try {
+			Bank bankCheck = readByBankPrefix(bank.getPrefix()); 
+			Connection connection = Database.getConnection(); 
+			statement = connection.createStatement();
+			String insertString = String.format(
+			        "insert into %s values('%s', '%s')", TABLE_NAME_BANKS, 
+			        bank.getPrefix(),
+			        bank.getName());
+			statement.executeUpdate(insertString);
+			LOG.debug(insertString);		
+		} catch (Exception e) {
+			LOG.error(e.getMessage());
+		}finally {
+			close(statement);
+		}
+	}
+	
+2016Jan02 - 
+Code sample
+
+try {
+			//note: trying to use json-simple-1.1.jar found on internet for json parsing and apache commons
+			//there was a certificate problem when I had https so I just changed it to http
+		    URL myURL = new URL("http://openexchangerates.org/api/latest.json?app_id=a42f2529c1ef4452bf3e69c3604f48de");
+		    URLConnection myURLConnection = myURL.openConnection();
+		    myURLConnection.connect();
+		    InputStream stream = myURLConnection.getInputStream();
+		    byte[] data = new byte[stream.available()];
+		    stream.read(data);
+		    String source = new String(data);
+		      
+		    //System.out.println(source);
+		   
+		    //stream.close();
+		    
+		    try {			
+				
+		    	LocalDate startDate = LocalDate.now();
+				DateTimeFormatter formatter = DateTimeFormatter
+						.ofPattern("yyyy-MM-dd");					
+				String FILE_NAME = startDate.format(formatter);			
+				File report = new File("reports");
+				File filepath = new File(report + "/" + "exchangeRate" + "/" + FILE_NAME + ".txt");
+//				File directory = new File(filepath.getParentFile().getAbsolutePath());
+//				directory.mkdirs(); 
+//				BufferedWriter writer = new BufferedWriter(new FileWriter(filepath)); // name of file not directory??	
+//				writer.newLine();		
+//				writer.write(source);
+//				writer.flush();
+//				writer.close();
+				
+				FileReader reader = new FileReader(filepath);				
+				JSONParser jsonParser = new JSONParser();
+				JSONObject jsonObject = (JSONObject) jsonParser.parse(reader);
+				
+				String base = (String) jsonObject.get("base");
+				System.out.println("BASE: " + base);
+				
+				Long timestamp = (Long) jsonObject.get("timestamp");
+				System.out.println("timestamp: " + timestamp);
+					
+				 // get an array from the JSON object
+				//rates is actually another JSONObject when you look at the file... it returns an Object but you can make another JSONObject
+				JSONObject obj= (JSONObject) jsonObject.get("rates");
+				System.out.println("object: " + obj.get("AED")); //this is where you would be the foreign currency name
+				//System.out.println(obj.entrySet());
+								
+//				Object[] list = obj.entrySet().toArray();		
+//				for(int i = 0; i <= list.length; i++){
+//					System.out.println(list[i]);//this prints the list in a list type good for dropbox in dialog
+//					//this doesn't return everything in alphabetical order
+//				}
+	
+				//this prints out the list in sorted order alphabetical order
+				SortedSet<String> keys = new TreeSet<String>(obj.keySet());
+				for (String key : keys) { 
+				   Object value = obj.get(key);
+				   //if statements double checks that it is a number
+				   if(value instanceof Number){
+					   Double valueAsADouble = ((Number)value).doubleValue(); //we have to do this because some of he values were integer numbers storing as a long, this makes everything into a double
+				   }
+				   System.out.println(key + " " + value);
+				}
+				
+				// get an array from the JSON object
+				JSONArray rates= (JSONArray) obj.get("rates"); //this would work if rates was not an object that I have to convert to a JSON prior
+				// take the elements of the json array
+				for(int i=0; i<= rates.size(); i++){
+					System.out.println("The " + i + " element of the array: "+ rates.get(i));
+				}
+								
+			} catch (Exception e1) {
+				LOG.error(e1.getMessage());
+			}
+		  		    
+		} catch (MalformedURLException e) { 
+		    LOG.error(e.getMessage());
+		} 
+		catch (IOException e) {   
+			LOG.error(e.getMessage());
+		}
+		
