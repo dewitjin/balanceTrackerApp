@@ -8,6 +8,7 @@
 package balanceTrackerBetaV1.database.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -81,12 +82,47 @@ public class AccountDao extends Dao {
 		LOG.info("Create statement: " + createStatement);
 
 	}
+	
 	/**
 	 * Add a account to the row
 	 * @param account
 	 * @throws SQLException
 	 */
 	public void add(Account account) throws SQLException {
+		Statement statement = null;
+		Account accountCheck;
+		try {
+			//accountCheck = readByBankPrefix(account.getName());
+			Connection connection = Database.getConnection();
+			statement = connection.createStatement();
+			String insertString = String.format(
+			        "insert into %s (%s, %s, %s, %s) values (?, ?, ?, ?)", 
+			        TABLE_NAME_ACCOUNTS, Fields.NAME_ACCOUNT,
+			        Fields.BANK_PREFIX,  Fields.BANK_NAME,
+			        Fields.TYPE);
+			        
+			PreparedStatement preparedStatement = connection.prepareStatement(insertString);
+			preparedStatement.setString(1,account.getName());
+			preparedStatement.setString(2,account.getBank().getPrefix());
+			preparedStatement.setString(3, account.getBank().getName());
+			preparedStatement.setString(4, account.getType());
+			preparedStatement.executeUpdate();
+			LOG.debug(insertString);
+		} catch (Exception e) {
+			LOG.error(e.getMessage());
+		} finally {
+			close(statement);
+		}
+	}
+	
+	/**
+	 * This method should not be used; used add()
+	 * Add a account to the row
+	 * Note: keeping it here just for other people to study
+	 * @param account
+	 * @throws SQLException
+	 */
+	public void addQueryWithoutPreparedStatement(Account account) throws SQLException {
 		Statement statement = null;
 		Account accountCheck;
 		try {
@@ -153,13 +189,50 @@ public class AccountDao extends Dao {
 		return account;
 	}
 	
+	/**
+	 * Updates an account row
+	 * Note: since 2016Jan07 haven't needed to use this update();
+	 * but it's here if I need it - tested already
+	 * @param bank
+	 * @throws SQLException
+	 */
+	public void update(Account account) throws SQLException {
+		Connection connection;
+		Statement statement = null;
+		int rowcount = 0;
+		try {
+			connection = Database.getConnection();
+			statement = connection.createStatement();
+			// Execute a statement
+			String sqlString = String
+			        .format("UPDATE %s set %s=?, %s=? , %s=?, %s=?" +
+			        		"WHERE %s=?", //note: wasn't working because I left out question mark here
+			        		TABLE_NAME_ACCOUNTS , Fields.NAME_ACCOUNT ,
+			        		Fields.BANK_PREFIX  , Fields.BANK_NAME    , 
+			        		Fields.TYPE         , Fields.NAME_ACCOUNT  
+			        		);	
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement.setString(1,account.getName());
+			preparedStatement.setString(2,account.getBank().getPrefix());
+			preparedStatement.setString(3, account.getBank().getName());
+			preparedStatement.setString(4, account.getType());
+			preparedStatement.setString(5, account.getName());
+			rowcount = preparedStatement.executeUpdate();
+			
+			LOG.debug("update statment: " + sqlString);
+			LOG.debug(String.format("Updated %d rows", rowcount));
+		} finally {
+			close(statement);
+		}
+	}
 	
 	/**
 	 * Updates an account row - general update statement
 	 * @param bank
 	 * @throws SQLException
 	 */
-	public void update(Account account) throws SQLException {
+	public void updateWithoutPreparedStatementQueries(Account account) throws SQLException {
 		Connection connection;
 		Statement statement = null;
 		try {
@@ -270,6 +343,7 @@ public class AccountDao extends Dao {
 				account.setType(resultSet.getString(Fields.TYPE.name()));			
 				accounts.add(account);
 				LOG.debug(account.toString());
+				System.out.println(account);
 			}				
 		} finally {
 			close(statement);

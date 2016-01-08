@@ -7,6 +7,7 @@
 package balanceTrackerBetaV1.database.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -133,6 +134,95 @@ public class BalanceDao extends Dao{
 	public int update(Balance balance) throws SQLException {
 		Connection connection;
 		Statement statement = null;
+		int rowcount;		
+		try {	
+			connection = Database.getConnection();
+			String sqlString;	
+			PreparedStatement preparedStatement; 
+			if (balance.existsInDatabase()) {
+				sqlString = String
+				        .format("UPDATE %s SET "
+				        		+ "%s=?, %s=?, %s=?, %s=?, "
+				        		+ "%s=?, %s=?, %s=?, %s=?, %s=? "
+				        		+ "WHERE %s=?",
+				        		TABLE_NAME_BALANCES, 
+				                //Fields.REFERENCE_KEY(1), 
+								Fields.BANK_NAME    , //note: this isn't a '%s' it's just %s
+								Fields.PREFIX       , 
+								Fields.ACCOUNT_NAME ,
+								Fields.ACCOUNT_TYPE , 
+								Fields.YEAR_UPDATED , 
+								Fields.MONTH        , 
+								Fields.DAY_OF_MONTH , 
+								Fields.AMOUNT       , 
+								Fields.EXTRA_NOTES  , 
+								Fields.REFERENCE_KEY);
+							
+								preparedStatement = connection.prepareStatement(sqlString);
+								//note: index 1 here is not key it's name!
+								//TODO: need to test this to see if PK gets updated properly
+								preparedStatement.setString(1, balance.getBank().getName()   );
+								preparedStatement.setString(2, balance.getBank().getPrefix() );
+								preparedStatement.setString(3, balance.getAccount().getName());
+								preparedStatement.setString(4, balance.getAccount().getType());
+								preparedStatement.setInt   (5, balance.getYear()			 );
+								preparedStatement.setInt   (6, balance.getMonth()			 );
+								preparedStatement.setInt   (7, balance.getDayOfMonth()		 );
+								preparedStatement.setFloat (8, balance.getAmount()			 );
+								preparedStatement.setString(9, balance.getExtraNotes()	 	 );
+								preparedStatement.setInt   (10,  balance.getKey()			 );			        	
+								LOG.debug("update statment: " + sqlString);
+			} else {
+				balance.setKey(++referenceKey); //this is what increments the PK properly!
+				sqlString = String.format(
+						//%.2F means needs two number after decimal
+				        "insert into %s ( %s ,%s,%s, %s, %s, %s, %s, %s, %s, %s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ? )",              
+				        TABLE_NAME_BALANCES , Fields.REFERENCE_KEY, //primary key	
+						Fields.BANK_NAME    , Fields.PREFIX,
+						Fields.ACCOUNT_NAME , Fields.ACCOUNT_TYPE,
+						Fields.YEAR_UPDATED , Fields.MONTH,
+						Fields.DAY_OF_MONTH ,  Fields.AMOUNT,
+						Fields.EXTRA_NOTES );
+						preparedStatement = connection.prepareStatement(sqlString);
+						preparedStatement.setInt    (   1, balance.getKey()              );
+						preparedStatement.setString (   2, balance.getBank().getName()   );
+						preparedStatement.setString (   3, balance.getBank().getPrefix() );
+						preparedStatement.setString (   4, balance.getAccount().getName());
+						preparedStatement.setString (   5, balance.getAccount().getType());
+						preparedStatement.setInt    (   6, balance.getYear()             );
+						preparedStatement.setInt    (   7, balance.getMonth()            );
+						preparedStatement.setInt    (   8, balance.getDayOfMonth()       );
+						preparedStatement.setFloat  (   9, balance.getAmount()           );
+						preparedStatement.setString (  10, balance.getExtraNotes()       );						
+						LOG.debug("add statment: " + sqlString);	
+			}
+			
+			rowcount = preparedStatement.executeUpdate();
+			LOG.debug(String.format("Updated %d rows", rowcount));
+		} finally {
+			close(statement);
+		}
+		return rowcount;
+	}
+	
+	/**
+	 * This method should not be used. 
+	 * This works fine BUT if a hacker tried to add something like an apostrophe, the 
+	 * APP will crashed. The update() works with prepared statement to prevent this from happening.
+	 *  
+	 * Updates a balance row if the balance exists in the table already (PK key
+	 * will be updated automatically). If the balance does not exist then we
+	 * insert a new balance and assign it a new incremented PK (this insert part
+	 * is basically the old and deleted add method from assignment 2 project)
+	 * NOTE: this update method does not take a param of reference key, so it
+	 * doesn't update a specific line - TODO create a method that does??
+	 * 
+	 * @param balance
+	 * @throws SQLException
+	 */
+	public int updateQqueryWithoutPreparedStatements(Balance balance) throws SQLException {
+		Connection connection;
+		Statement statement = null;
 		int rowcount;
 		
 		try {
@@ -186,6 +276,7 @@ public class BalanceDao extends Dao{
 		}
 		return rowcount;
 	}
+	
 	
 	/**
 	 * Retrieves a Balance 
@@ -246,6 +337,8 @@ public class BalanceDao extends Dao{
 	 * to PREPEND the words CLOSED dash "the day it was closed" and the account name
 	 * NOTE: this method updates future balance inputs with this account name to the new account name,
 	 * but I don't think it updates all the old balances to the new name
+	 * TODO: This method will not closed bad SQL injection named, might want a way to deal with it;
+	 * maybe just reject the addition all together in the addAccountDialog??
 	 * @param account
 	 * @param date
 	 */
@@ -277,7 +370,11 @@ public class BalanceDao extends Dao{
 	}
 	
 	/**
-	 * Updates a balance row - this is the old update method, probably can delete now
+	 * This is method should not be used.
+	 * It is version one of an update method; but in order for the App to increment PK properly,
+	 * there is a method that will either update or add a balance in one so use the method update()
+	 * Note: keep this function for study purpose.
+	 * Updates a balance row - 
 	 * @param bank
 	 * @throws SQLException
 	 */
@@ -355,16 +452,21 @@ public class BalanceDao extends Dao{
 		Account account = null;
 		int count = 0;
 		try {
+
+			System.out.println(1);
 			connection = Database.getConnection();
 			statement = connection.createStatement();
 			String sqlString = String.format("SELECT * FROM %s", TABLE_NAME_BALANCES);
 			ResultSet resultSet = statement.executeQuery(sqlString);
 			LOG.debug(sqlString);
 			while (resultSet.next()) {
+				System.out.println(2);
 				count++;				
 			    balance = balance(resultSet); 
 			    balances.add(balance);
-				LOG.debug("value of count not primary key: " + count + " " + balance);
+			    //TODO need to change this to debug before git push 2016Jan07
+				LOG.error("value of count not primary key: " + count + " " + balance);
+				System.out.println(balance);
 			}				
 		} finally {
 			close(statement);

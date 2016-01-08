@@ -65,7 +65,8 @@ public class Bank {
 	 */
 	@Override
 	public String toString() {
-		return "Bank [name=" + name + ", prefix=" + prefix + "]";
+		
+		return "Bank [prefix=" + prefix + " name=" + name + "]";
 	}
 
 }

@@ -7,6 +7,7 @@
 package balanceTrackerBetaV1.database.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -72,12 +73,40 @@ public class BankDao extends Dao {
 		super.create(createStatement);
 		LOG.info("Create statement: " + createStatement);
 	}
+	
 	/**
 	 * Add a bank to the row
 	 * @param bank
 	 * @throws SQLException
 	 */
-	public void add(Bank bank) throws SQLException {
+	public void add(Bank bank) {
+		Statement statement = null;	
+	
+		try {		
+			Connection connection = Database.getConnection(); 
+			String insertString = String.format("insert into %s (%s, %s) values (?, ?) ", 
+					TABLE_NAME_BANKS, Fields.PREFIX, Fields.NAME  );
+			PreparedStatement preparedStatement = connection.prepareStatement(insertString);
+			preparedStatement.setString(1,bank.getPrefix());
+			preparedStatement.setString(2,bank.getName());
+			preparedStatement.executeUpdate();
+			LOG.debug(insertString);		
+		} catch (Exception e) {
+			LOG.error(e.getMessage());
+		}finally {
+			close(statement);
+		}	
+	}
+	
+	/**
+	 * This method should not be used - used add() It is an old verison,
+	 * without prepared statement queries.
+	 * Add a bank to the row
+	 * Note: keeping the function here just for other people to study.
+	 * @param bank
+	 * @throws SQLException
+	 */
+	public void addQueryWithoutPreparedStatements(Bank bank) throws SQLException {
 		Statement statement = null;
 		
 		try {
@@ -135,11 +164,48 @@ public class BankDao extends Dao {
 	}
 	
 	/**
-	 * Updates a bank row
+	 * Updates a bank row 
+	 * Note: since 2016Jan07 haven't needed to use this update();
+	 * but it's here if I need it - tested already
 	 * @param bank
 	 * @throws SQLException
 	 */
 	public void update(Bank bank) throws SQLException {
+		Connection connection;
+		Statement statement = null;
+		int rowcount = 0;
+		try {
+			connection = Database.getConnection();
+			statement = connection.createStatement();
+			// Execute a statement
+			String sqlString = String
+			        .format("UPDATE %s set %s=?, %s=? " +
+			        		"WHERE %s=?",
+			        		TABLE_NAME_BANKS, 
+			        		Fields.PREFIX , 
+							Fields.NAME   , 
+							Fields.PREFIX );
+			        		
+			PreparedStatement preparedStatement = connection.prepareStatement(sqlString);
+			preparedStatement.setString(1,bank.getPrefix());
+			preparedStatement.setString(2,bank.getName());
+			preparedStatement.setString(3,bank.getPrefix());
+			rowcount = preparedStatement.executeUpdate();		
+			LOG.debug(sqlString);
+			LOG.debug(String.format("Updated %d rows", rowcount));
+			
+		} finally {
+			close(statement);
+		}
+	}
+	
+	
+	/**
+	 * Updates a bank row
+	 * @param bank
+	 * @throws SQLException
+	 */
+	public void updateWithoutPreparedStatmentQueries(Bank bank) throws SQLException {
 		Connection connection;
 		Statement statement = null;
 		try {
