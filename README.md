@@ -42,6 +42,10 @@ In order to keep track of "cash", I used the Open Exchange Rates API (https://op
 
 However, the jar file attached will have this function enabled for you to use to start converting cash balances. Note that my APP ID comes with the free version of the API, which means the currency-based rate is in USD dollars. Since I am storing all my balances in CAD dollars, I convert foreign currencies to USD and then CAD before sending data to the database.  If you need to store in different currencies then you will have to modify various methods.
 
+Note: I had some questions about configuring log4j2.  There's more information about how to configure the jar file in Main.class but I'm attaching this printshot of what my build paths are to help.
+
+![alt tag](https://raw.githubusercontent.com/dewitjin/balanceTrackerApp/master/images/log4j2.png)
+
 ## Tests
 
 No test right now.
