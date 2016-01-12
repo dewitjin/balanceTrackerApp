@@ -130,4 +130,25 @@ public class Account {
 			return accountType;
 		}
 	}
+	
+	/**
+	 * Implemented in order to perform JUnit testing assertEquals correctly
+	 * TODO: Note: look in AddAccountDialogTest class
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (!(o instanceof Account)) {
+			return false;
+		}
+		Account account = (Account) o;
+
+		boolean result = (this.name.equalsIgnoreCase(account.name)
+				&& this.bank.equals(account.bank) && this.type
+				.equalsIgnoreCase(account.type));
+
+		return result;
+	}
 }

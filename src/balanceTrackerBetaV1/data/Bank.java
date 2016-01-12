@@ -68,5 +68,17 @@ public class Bank {
 		
 		return "Bank [prefix=" + prefix + " name=" + name + "]";
 	}
+	
+	/**
+	 * Implemented in order to perform JUnit testing assertEquals correctly
+	 * Note: look in AddAccountDialogTest class
+	 */
+	@Override
+	public boolean equals(Object o){
+		 if(o == null) {return false; }
+		 if(!(o instanceof Bank)) {return false; }
+		 Bank bank = (Bank) o;
+		 return (this.prefix.equalsIgnoreCase(bank.prefix) && this.name.equalsIgnoreCase(bank.name));
+	}
 
 }
