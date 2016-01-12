@@ -48,7 +48,7 @@ Note: I had some questions about configuring log4j2.  There's more information a
 
 ## Tests
 
-No test right now.
+Test is being executed with JUnit Framework. The test classes are being stored in a package called jUnitTest within src folder. Right now there are 16 test for the AddAccountDialog class.
 
 ## Contributors
 
