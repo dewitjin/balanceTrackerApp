@@ -32,7 +32,7 @@ Special thanks to Matthew Lawrence for his code reviews and help to get the proj
 This project was built using Eclipse but you don't need Eclipse to run the jar file in the out folder.  First, in order to run the jar file to see what the app can do, you need to go into the out directory and run this command java -jar betaTracker.jar. Second, if you would like to modify the code and customize parts of it for your use, download the files and import it to an integrated development environment (IDE) such as Eclipse and start editing.
 
 There are many things you could do to expand this project.  There are many things I would like to do, but this simple
-App will help you track your finances right now without medications.
+App will help you track your finances right now without modifications.
 
 ## API Reference
 
