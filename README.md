@@ -52,7 +52,7 @@ Test is being executed with JUnit Framework. The test classes are being stored i
 
 ## Contributors
 
-The best way to reach me is via my Email at dewi.tjin@gmail.com.
+The best way to reach me is via my Email at dewi.tjin + @ + gmail.com.
 
 If you would like to contribute please fork the repo and I will review code.
 
